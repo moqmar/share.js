@@ -4,24 +4,20 @@ A simple public file hosting application with protected upload and without any f
 
 ## Usage
 
----
-
-`sharejs --key`
-
-Just generate a random new upload key and print it to STDOUT.
-
----
-
 `sharejs [--host <host>] [--port <port>] [--path <path>] [--prefix <prefix>]`
 
 Start the server.
 
 **host**: The host address to bind to  
-**port**: The port to bind to
+**port**: The port to bind to  
 **path**: The path to the data storage (where all files will be uploaded to)  
 **prefix**: The domain prefix - with `--prefix https://example.org/` the server will return the URL `https://example.org/12345678`
 
 ---
+
+`sharejs --key`
+
+Just generate a random new upload key and print it to STDOUT.
 
 ## Upload
 
