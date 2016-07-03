@@ -1,0 +1,19 @@
+{
+  "name": "share.js",
+  "version": "1.0.0",
+  "description": "A simple file uploading and hosting tool",
+  "author": "Moritz Marquardt",
+  "license": "MIT",
+  "homepage": "https://github.com/moqmar/share.js#readme",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/moqmar/share.js.git"
+  },
+  "bugs": {
+    "url": "https://github.com/moqmar/share.js/issues"
+  },
+  "dependencies": {
+    "sqlite3": "^3.1.4"
+  }
+}
