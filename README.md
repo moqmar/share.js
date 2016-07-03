@@ -34,7 +34,7 @@ HTTP/1.1 200 OK
 https://example.org/12345678
 ```
 
-The `Filename` header can be e.g. set to `@index.html` if you want the file to be downloadable and saved with a specific name.
+The `Filename` header can be e.g. set to `index.html` if you want the file to be downloadable and saved with a specific name.
 
 ## Upload using curl
 
