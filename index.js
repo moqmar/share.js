@@ -72,7 +72,13 @@ http.createServer(function(req, res) {
                 res.end((arg("prefix") || "") + u.id + "\n");
             });
         })
-        return;
+    }
+
+    else if ((req.method == "GET" || req.method == "HEAD") && keys.get().split("\n").map(x => x.trim()).filter(x => !x.match(/^#|^$/)).indexOf(req.url.replace(/^\/*/, "")) != -1) {
+        res.setHeader("Content-Type", "text/html; charset=utf-8");
+        res.setHeader("Cache-Control", "public max-age=31536000");
+        res.setHeader("Expires", new Date(Date.now() + 31536000*1000).toUTCString());
+        fs.createReadStream(__dirname + "/upload.html").pipe(res);
     }
 
     else if ((req.method == "GET" || req.method == "HEAD") && req.url.match(/^\/[a-zA-Z0-9]{8}\/?(?:$|\?)/)) {

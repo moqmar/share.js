@@ -1,0 +1,201 @@
+<!doctype html>
+<html>
+    <head>
+        <title>upload</title>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width">
+        <link rel="shortcut icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAABWklEQVRYR+2WT06EMBSHf30Uoys3M+hOj8IcwXiB2egpDFbiHSbu5gjGC4g30Z2BmYUrTaa0phpQ1Jj+mQQWsOX1/T4+HqUMPV+s53yMAMMxkGTytIZcEKKp7Vxowmwl4sK2/q+61sDk4q1iFE0cmz1UeZw6rumUtwDTbKN9GoVaCAYAEGRhGwDO4hTqKiJ+Xgp+2wuAITYQ63w36Q3AQFR5zIYD4Pwit7RgOAZ894EQEcEzoKGfQGwOpZcM7MgVJgjAhHOq02ex93goXo+ligpXCG+AJlwpPi/zWCTZRhDJpSuEF8D3cA1cmiZmfhhw5QrhB0CYkUJqwpvNpBlgA6EIBVO4t5kHLwBAvQC03wQ0Br4Cu/f/A/EE6Lb8DWDz7J81I0DHgOeR7EOjzy6qlC7X1zsH7b8gyeRJDXnjcij9+RXYvn0TzjidrQS/G86x3JZ+23Wjgd4NvAProcchQVyE3AAAAABJRU5ErkJggg==">
+        <style>
+            @import url(https://fonts.googleapis.com/css?family=Open+Sans:400,300,600);
+            html, body {
+                margin: 0; padding: 0; width: 100%; min-height: 100vh;
+                box-sizing: border-box;
+                background: #f4f44; color: #555;
+                text-align: center;
+                font-family: Open Sans; font-weight:  300;
+                font-size: 14px;
+                overflow-y: auto; overflow-x: hidden;
+            }
+            body { display: flex; align-items: center; justify-content: center; padding: 10px; }
+            main { padding: 25px; max-width: 100%; }
+            #upload { position: relative; display: inline-block; cursor: pointer; max-width: 100%; }
+            #upload input { position: absolute; top: 0; left: 0; right: 0; bottom: 0; width: 100%; height: 100%; opacity: 0; }
+            #upload label {
+                display: inline-block;
+                background: transparent;
+                border: 3px solid #fc0;
+                padding: 25px 15px;
+                width: 220px; max-width: 100%;
+                box-sizing: border-box;
+                font-size: 20px;
+                transition: background 0.2s;
+            }
+            #upload:hover label { background: #fc0; }
+            p { margin: 10px 0 0; padding: 0; }
+            a { color: #08f; font-weight: bold; }
+            .uploads {
+                width: 300px; max-width: 100%;
+                margin: 0 auto;
+                text-align: left;
+            }
+            .uploads>div {
+                font-size: 16px;
+                margin-top: 15px;
+                opacity: 0.4;
+            }
+            .uploads>div:first-child {
+                margin-top: 50px;
+                opacity: 1;
+            }
+            .uploads>div:nth-child(2) { opacity: 0.8; }
+            .uploads>div:nth-child(3) { opacity: 0.6; }
+            .uploads>div .flex {
+                display: flex;
+                justify-content: space-between;
+            }
+            .uploads>div strong {
+                text-overflow: ellipsis;
+                overflow: hidden;
+                white-space: nowrap;
+                flex-grow: 1;
+            }
+            .uploads>div em {
+                font-style: normal;
+                white-space: nowrap;
+            }
+            .uploads>div small {
+                font-size: 12px;
+            }
+            .uploads>div small.error {
+                color: #f03;
+                font-weight: bold;
+            }
+            .uploads>div .progress {
+                width: 100%; height: 3px; background: #e8e8e8;
+                margin: 3px 0;
+            }
+            .uploads>div .progress>div {
+                height: 3px; background: #fc0;
+                transition: width 0.2s;
+            }
+        </style>
+    </head>
+    <body>
+        <main>
+            <div id="upload">
+                <label for="upload">select files</label>
+                <input type="file" id="upload" multiple>
+            </div>
+            <p>
+                paste any image or text with <strong>ctrl+v</strong><br>
+                <strong>drag + drop</strong> any file to this window
+            </p>
+            <div class="uploads"></div>
+        </main>
+        <script>
+            function Uploader(file, attachment) {
+                if (this.constructor != Uploader) throw new Error("Uploader must be called with the keyword 'new'");
+
+                this.filename = file.name || "";
+                this.size = file.size;
+
+                this.element = document.createElement("div");
+                this.element.innerHTML =
+                    "<div class='flex'><strong>" + this.escape(this.filename) + "</strong><em>" + this.sizeFormat(file.size) + "</em></div>" +
+                    "<div class='progress'><div class='x-progress' style='width:0%'></div></div>" +
+                    "<div class='flex'><small class='x-status'>0%</small>" +
+                    "<small class='x-remaining'></small></div>";
+                var uplbox = document.getElementsByClassName("uploads")[0];
+                uplbox.insertBefore(this.element, uplbox.firstChild);
+
+                this.startTime = new Date().getTime();
+
+                var req = new XMLHttpRequest();
+                req.open("POST", location.href);
+                if (attachment) req.setRequestHeader("Filename",     file.name);
+                else            req.setRequestHeader("Content-Type", file.type);
+
+                req.upload.addEventListener("progress", function(progress) {
+                    var now = Date.now();
+
+                    var averageSpeed = Math.round(progress.loaded / ((now - this.startTime) / 1000))
+                    var remainingSeconds = (progress.total - progress.loaded) / averageSpeed;
+                    
+                    this.element.querySelector(".x-progress").style.width = (progress.loaded / progress.total) + "%";
+                    this.element.querySelector(".x-status").innerHTML = Math.round(progress.loaded / progress.total) + "%";
+                    this.element.querySelector(".x-remaining").innerHTML = this.timeFormat(remainingSeconds);
+                }.bind(this))
+
+                req.addEventListener("readystatechange", function(event) {
+                    if (req.readyState == 4 && req.status == 200) {
+                        var link = req.responseText.trim();
+                        this.element.querySelector(".x-status").innerHTML = "<a href='" + link + "' target='_BLANK'>" + link + "</a>";
+                        this.element.querySelector(".x-progress").style.width = "100%";
+                        this.element.querySelector(".x-remaining").style.display = "none";
+                    } else if (req.readyState == 4) {
+                        this.element.querySelector(".x-progress").style.width = "100%";
+                        this.element.querySelector(".x-progress").style.color = "#f03";
+                        this.element.querySelector(".x-status").innerHTML = (req.responseText || (req.status == 0 ? "No connection" : "Status code " + req.status));
+                        this.element.querySelector(".x-status").classList.add("error");
+                        this.element.querySelector(".x-remaining").style.display = "none";
+                    }
+                }.bind(this))
+
+                req.send(file);
+            }
+
+            Uploader.prototype.timeFormat = function timeFormat(time) {
+                function padding(n, x) { x=""+x; while (x.length < n) x = "0" + x; return x; }
+                return padding(2, Math.floor(time / 60)) + ":" + padding(2, Math.floor(time % 60));
+            }
+            Uploader.prototype.escape = function escape(str) {
+                return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+            }
+            Uploader.prototype.sizeFormat = function sizeFormat(size) {
+                if (size < 1024) return size + " Bytes";
+                if (size < 1024*1024) return (Math.floor(size/1024*10)/10) + " KB";
+                if (size < 1024*1024*1024) return (Math.floor(size/1024/1024*10)/10) + " MB";
+                if (size < 1024*1024*1024*1024) return (Math.floor(size/1024/1024/1024*10)/10) + " GB";
+                else return (Math.floor(size/1024/1024/1024/1024*10)/10) + " TB";
+            }
+
+            // Drag + Drop
+            document.addEventListener("dragover", event => event.preventDefault());
+            document.addEventListener("drop", function(event) {
+                event.preventDefault();
+                for (var i = 0; i < event.dataTransfer.files.length; i++) {
+                    new Uploader(event.dataTransfer.files[i], false);
+                }
+            })
+
+            // Copy + Paste
+            document.addEventListener("paste", function(event) {
+                event.preventDefault();
+                var matches = 0;
+                console.log("yay!")
+                for (var i = 0; i < event.clipboardData.items.length; i++) if (event.clipboardData.items[i].kind == "file") {
+                    matches++; // Files
+                    new Uploader(event.clipboardData.items[i].getAsFile(), false);
+                }
+                if (!matches) {     // Plain Text
+                    var d = event.clipboardData.getData("Text").replace(/^/, "");
+                    if (!d) return;
+                    if (d.length < 5) return;
+                    // Somehow a "confirm" here without a setTimeout leads to the event fired twice?!
+                    setTimeout(function(d) {
+                        if (d.length < 100 && !confirm("You are about to upload the following plain text:\n\n" + d + "\n")) return;
+                        new Uploader(new Blob([d], { type: "text/plain" }));
+                    }, 0, d);
+                }
+            })
+
+            // File Input
+            document.getElementsByTagName("input")[0].addEventListener("change", function(event) {
+                for (var i = 0; i < event.target.files.length; i++) {
+                    new Uploader(event.target.files[i], false);
+                }
+                this.value = "";
+            });
+        </script>
+    </body>
+</html>
