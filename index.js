@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 if (arg("key", true)) process.exit(console.log(require("crypto").randomBytes(32).toString("hex")) || 0);
 
 const storage = (arg("path") || process.cwd()).replace(/\/$/, ""),
