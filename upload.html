@@ -4,13 +4,13 @@
         <title>upload</title>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width">
-        <link rel="shortcut icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAABWklEQVRYR+2WT06EMBSHf30Uoys3M+hOj8IcwXiB2egpDFbiHSbu5gjGC4g30Z2BmYUrTaa0phpQ1Jj+mQQWsOX1/T4+HqUMPV+s53yMAMMxkGTytIZcEKKp7Vxowmwl4sK2/q+61sDk4q1iFE0cmz1UeZw6rumUtwDTbKN9GoVaCAYAEGRhGwDO4hTqKiJ+Xgp+2wuAITYQ63w36Q3AQFR5zIYD4Pwit7RgOAZ894EQEcEzoKGfQGwOpZcM7MgVJgjAhHOq02ex93goXo+ligpXCG+AJlwpPi/zWCTZRhDJpSuEF8D3cA1cmiZmfhhw5QrhB0CYkUJqwpvNpBlgA6EIBVO4t5kHLwBAvQC03wQ0Br4Cu/f/A/EE6Lb8DWDz7J81I0DHgOeR7EOjzy6qlC7X1zsH7b8gyeRJDXnjcij9+RXYvn0TzjidrQS/G86x3JZ+23Wjgd4NvAProcchQVyE3AAAAABJRU5ErkJggg==">
+        <link rel="shortcut icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAn1BMVEUAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAC3kz5EAAAANHRSTlMA8ftUNgckEsG7ffXm4reD3NbJsq2opZtkX1oXDgUD7M5QTDor0Z54aDEc36KOiCjgb2tKzTmi7AAAAU5JREFUOMuVkudygzAMgGWDAZudMMJKIHs0SYff/9nqcoSqAXLX7wcnWR86CQOI82ccEmq/e74OI2w8Sub+QssO+4sMs+VT2Uyk1VSPTN/T3d8uJ9ddA8bg9IjbE27CE0KKPr6TqIIBC/nowUKLwQiCdnP45AxjLK1du0thf6BtOJr+TrO2gcN+6zNJkPEWgsL1Ud2RDjI2UsVbeUJ1Q+ZzZLhCbUOWqA5SY8hIPIDr7JFx1wAlgDKK7uhwUYPM+xswoBWAaf3HsgHiCDBKQOQUYO+9EI4EwA9fCLcdgEbLaYEnAIVcTwrMXqinFU8KOf3ZN6PnKaFuN6yCBJ3FOmrQ3cIaTYEpnLSL0tV2pM6soOxDd2gwD71WWqR5qhv1Ssd6KmMD5aWwa5VjvgIaNWUbVpvrihyqwT+cc0oDHnm1LQNhwhhmI9IkvWUG/INvWLkXg6GFuPUAAAAASUVORK5CYII=">
         <style>
             @import url(https://fonts.googleapis.com/css?family=Open+Sans:400,300,600);
             html, body {
                 margin: 0; padding: 0; width: 100%; min-height: 100vh;
                 box-sizing: border-box;
-                background: #f4f44; color: #555;
+                background: #f4f4f4; color: #555;
                 text-align: center;
                 font-family: Open Sans; font-weight:  300;
                 font-size: 14px;
@@ -62,6 +62,7 @@
             .uploads>div em {
                 font-style: normal;
                 white-space: nowrap;
+                margin-left: 5px;
             }
             .uploads>div small {
                 font-size: 12px;
@@ -96,7 +97,7 @@
             function Uploader(file, attachment) {
                 if (this.constructor != Uploader) throw new Error("Uploader must be called with the keyword 'new'");
 
-                this.filename = file.name || "";
+                this.filename = file.name || "[clipboard]";
                 this.size = file.size;
 
                 this.element = document.createElement("div");
@@ -112,7 +113,7 @@
 
                 var req = new XMLHttpRequest();
                 req.open("POST", location.href);
-                if (attachment) req.setRequestHeader("Filename",     file.name);
+                if (attachment) req.setRequestHeader("Filename",     file.name || "[]");
                 else            req.setRequestHeader("Content-Type", file.type);
 
                 req.upload.addEventListener("progress", function(progress) {
@@ -172,9 +173,8 @@
             document.addEventListener("paste", function(event) {
                 event.preventDefault();
                 var matches = 0;
-                console.log("yay!")
                 for (var i = 0; i < event.clipboardData.items.length; i++) if (event.clipboardData.items[i].kind == "file") {
-                    matches++; // Files
+                    matches++;      // Files
                     new Uploader(event.clipboardData.items[i].getAsFile(), false);
                 }
                 if (!matches) {     // Plain Text

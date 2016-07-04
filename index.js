@@ -9,7 +9,8 @@ const storage = (arg("path") || process.cwd()).replace(/\/$/, ""),
 
 var http = require("http"),
     fs = require("fs"),
-    sqlite = require("sqlite3");
+    sqlite = require("sqlite3"),
+    mime = require("mime");
 
 var db = new sqlite.Database(storage + "/.sharejs.sqlite");
 db.run("CREATE TABLE IF NOT EXISTS files (id TEXT PRIMARY KEY NOT NULL, mime TEXT NOT NULL, filename TEXT NULL)");
@@ -40,6 +41,10 @@ function createID() {
 
 function upload(mime, filename) {
     return createID().then(function(id) {
+        if (filename == "[]") {
+            var ext = mime.extension(mime);
+            filename = id + (ext ? "." + ext : "");
+        }
         db.run("INSERT INTO files VALUES (?, ?, ?)", id, mime, filename || null);
         return {
             id: id,
@@ -64,7 +69,10 @@ http.createServer(function(req, res) {
         if (!(req.headers["content-type"]||"").trim().match(/^(multipart\/|example\/|application\/x-www-form-urlencoded|$)/)) {
             type = req.headers["content-type"].trim();
         }
-        upload(type, req.headers["filename"]).then(function(u) {
+        var filename = req.headers["filename"];
+        if (filename != null && !filename) filename = "[]";
+        if (filename && filename != "[]") filename = filename.replace(/[^a-z0-9_\- .]/gi, "");
+        upload(type, filename).then(function(u) {
             req.pipe(u.stream);
             req.on("end", function() {
                 res.setHeader("Content-Type", "text/plain; charset=utf-8");
@@ -78,7 +86,7 @@ http.createServer(function(req, res) {
         res.setHeader("Content-Type", "text/html; charset=utf-8");
         res.setHeader("Cache-Control", "public max-age=31536000");
         res.setHeader("Expires", new Date(Date.now() + 31536000*1000).toUTCString());
-        fs.createReadStream(__dirname + "/upload.html").pipe(res);
+        if (req.method == "GET") fs.createReadStream(__dirname + "/upload.html").pipe(res);
     }
 
     else if ((req.method == "GET" || req.method == "HEAD") && req.url.match(/^\/[a-zA-Z0-9]{8}\/?(?:$|\?)/)) {
