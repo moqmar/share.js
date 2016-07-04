@@ -14,9 +14,9 @@ npm i -g git+https://git.mo-mar.de/momar/share.js.git
 
 Start the server.
 
-`--host` - The host address to bind to  
-`--port` - The port to bind to (default: 8000)  
-`--path` - The path to the data storage (where all files will be uploaded to)  
+`--host` - The host address to bind to (default: `::`)  
+`--port` - The port to bind to (default: `8000`)  
+`--path` - The path to the data storage (where all files will be uploaded to; default: `.`)  
 `--prefix` - The domain prefix - with `--prefix https://example.org/` the server will return the URL `https://example.org/12345678`
 
 ---
