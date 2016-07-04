@@ -122,9 +122,9 @@
                     var averageSpeed = Math.round(progress.loaded / ((now - this.startTime) / 1000))
                     var remainingSeconds = (progress.total - progress.loaded) / averageSpeed;
                     
-                    this.element.querySelector(".x-progress").style.width = (progress.loaded / progress.total) + "%";
+                    this.element.querySelector(".x-progress").style.width = (progress.loaded * 100 / progress.total) + "%";
                     if (!this.element.querySelector(".x-status").classList.contains("error"))
-                        this.element.querySelector(".x-status").innerHTML = Math.round(progress.loaded / progress.total) + "%";
+                        this.element.querySelector(".x-status").innerHTML = Math.round(progress.loaded * 100 / progress.total) + "%";
                     this.element.querySelector(".x-remaining").innerHTML = this.timeFormat(remainingSeconds);
                 }.bind(this))
 
