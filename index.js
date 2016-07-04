@@ -18,7 +18,8 @@ db.run("CREATE TABLE IF NOT EXISTS files (id TEXT PRIMARY KEY NOT NULL, mime TEX
 if (!fs.existsSync(storage + "/.sharejs.keys")) {
     var key = require("crypto").randomBytes(32).toString("hex");
     fs.writeFileSync(storage + "/.sharejs.keys", key + "\n");
-    console.log("Your upload key: " + key + "\n");
+    console.log("Your upload key: " + key);
+    if (arg("prefix")) console.log("Upload files at: " + arg("prefix") + key + "\n");
     console.log("To add another key:\n  sharejs --key | tee --append .sharejs.keys\n");
 }
 var keys = require("./livefile")(storage + "/.sharejs.keys");
