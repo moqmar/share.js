@@ -25,6 +25,10 @@ Start the server.
 
 Just generate a random new upload key and print it to STDOUT.
 
+## Web Upload
+
+You can upload files directly via the browser by going to `http://example.org/<uploadkey>`.
+
 ## Upload
 
 ```http
