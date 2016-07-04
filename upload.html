@@ -123,7 +123,8 @@
                     var remainingSeconds = (progress.total - progress.loaded) / averageSpeed;
                     
                     this.element.querySelector(".x-progress").style.width = (progress.loaded / progress.total) + "%";
-                    this.element.querySelector(".x-status").innerHTML = Math.round(progress.loaded / progress.total) + "%";
+                    if (!this.element.querySelector(".x-status").classList.contains("error"))
+                        this.element.querySelector(".x-status").innerHTML = Math.round(progress.loaded / progress.total) + "%";
                     this.element.querySelector(".x-remaining").innerHTML = this.timeFormat(remainingSeconds);
                 }.bind(this))
 
@@ -135,7 +136,7 @@
                         this.element.querySelector(".x-remaining").style.display = "none";
                     } else if (req.readyState == 4) {
                         this.element.querySelector(".x-progress").style.width = "100%";
-                        this.element.querySelector(".x-progress").style.color = "#f03";
+                        this.element.querySelector(".x-progress").style.background = "#f03";
                         this.element.querySelector(".x-status").innerHTML = (req.responseText || (req.status == 0 ? "No connection" : "Status code " + req.status));
                         this.element.querySelector(".x-status").classList.add("error");
                         this.element.querySelector(".x-remaining").style.display = "none";
