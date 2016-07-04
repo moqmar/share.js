@@ -6,6 +6,9 @@
   "license": "MIT",
   "homepage": "https://github.com/moqmar/share.js#readme",
   "main": "index.js",
+  "bin": {
+    "sharejs": "./index.js"
+  }
   "repository": {
     "type": "git",
     "url": "git+https://github.com/moqmar/share.js.git"

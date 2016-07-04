@@ -2,6 +2,12 @@
 
 A simple public file hosting application with protected upload and without any frontend. Just plain HTTP.
 
+## Installation
+
+```bash
+npm i -g https://git.mo-mar.de/momar/share.js.git
+```
+
 ## Usage
 
 `sharejs [--host <host>] [--port <port>] [--path <path>] [--prefix <prefix>]`
@@ -44,7 +50,7 @@ curl example.org --data-binary @example.txt
 # An image
 curl example.org -H Content-Type:image/png --data-binary @example.png
 # A downloadable file
-curl example.org -H Filename:invoice.png --data-binary @invoice.png
+curl example.org -H Filename:example.pdf --data-binary @example.pdf
 # STDIN
 echo "Hello World" | curl example.org --data-binary @-
 ```
