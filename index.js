@@ -29,6 +29,12 @@ function arg(name, bool) {
     else return process.argv[process.argv.slice(2).indexOf((name.length == 1 ? "-" : "--") + name) < 0 ? -1 : process.argv.slice(2).indexOf((name.length == 1 ? "-" : "--") + name) + 3];
 }
 
+function sanitizePath(path) {
+    var regex = /(?:[^\/]*\/|^)\.\.(?:\/|$)|(?:\/|^)\.(?=\/|$)|\/{2,}/g;
+    while (path != (path = path.replace(regex, ""))) {}
+    return path;
+}
+
 function createID() {
     return new Promise(function(resolve, reject) {
         var s = "";
@@ -144,9 +150,23 @@ http.createServer(function(req, res) {
     }
 
     else {
-        res.setHeader("Content-Type", "text/plain; charset=utf-8");
-        res.statusCode = 404;
-        res.end(e404 + "\n");
+        req.url = sanitizePath(req.url);
+        fs.stat(__dirname + "/public" + req.url, function(err, stats) {
+            if (!err && stats.isFile()) {
+                res.setHeader("Cache-Control", "public max-age=31536000");
+                res.setHeader("Expires", new Date(Date.now() + 31536000*1000).toUTCString());
+                switch ((req.url.match(/\.([^\.]+)$/)||[,""])[1]) {
+                    case "css":  res.setHeader("Content-Type", "text/css; charset=utf-8"); break;
+                    case "woff": res.setHeader("Content-Type", "application/font-woff"); break;
+                    default:     res.setHeader("Content-Type", "text/plain; charset=utf-8");
+                }
+                if (req.method == "GET") fs.createReadStream(__dirname + "/public" + req.url).pipe(res);
+            } else {
+                res.setHeader("Content-Type", "text/plain; charset=utf-8");
+                res.statusCode = 404;
+                res.end(e404 + "\n");
+            }
+        })
     }
 }).listen(parseInt(arg("port") || 8000), arg("host") || "::", function(err) {
     if (err) throw err;
